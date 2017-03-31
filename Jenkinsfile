@@ -38,12 +38,19 @@ node {
     echo 'This will always run'
   }
 
-  docker.image('node:7-alpine').inside {
-    stage('Test') {
-      sh '''
-        node --version
-        echo "Done"
-      '''
+  // docker.image('node:7-alpine').inside {
+  //   stage('Test') {
+  //     sh '''
+  //       node --version
+  //       echo "Done"
+  //     '''
+  //   }
+  // }
+
+  withEnv(['DISABLE_AUTH=true',
+        'DB_ENGINE=sqlite']) {
+    stage('Build2') {
+      sh 'printenv'
     }
   }
 }
