@@ -1,22 +1,28 @@
 node {
-  stage('Build') {
-    retry(3) {
-      sh 'echo "Hello World"'
-    }
-
-    timeout(time: 3, unit: 'MINUTES') {
-      sh '''
-        echo "Multiline shell steps works too"
-        ls -lah
-      '''
-    }
-  }
-
   try {
+    withEnv(['DISABLE_AUTH=true',
+          'DB_ENGINE=sqlite']) {
+      stage('Build2') {
+        sh 'printenv'
+      }
+    }
+
+    stage('Build') {
+      retry(3) {
+        sh 'echo "Hello World"'
+      }
+
+      timeout(time: 3, unit: 'MINUTES') {
+        sh '''
+          echo "Multiline shell steps works too"
+          ls -lah
+        '''
+      }
+    }
+
     stage('Test') {
         sh 'echo "Success"'
     }
-    echo 'This will run only if successful'
   } catch (e) {
     echo 'This will run only if failed'
 
@@ -24,38 +30,10 @@ node {
     // we need to re-throw it, to ensure that the build is marked as failed
     throw e
   } finally {
-    def currentResult = currentBuild.result ?: 'SUCCESS'
-    if (currentResult == 'UNSTABLE') {
-      echo 'This will run only if the run was marked as unstable'
-    }
+    //echo currentBuild.getClass().getCanonicalName();
+    //echo currentBuild.getClass().getName();
 
-    def previousResult = currentBuild.previousBuild?.result
-    if (previousResult != null && previousResult != currentResult) {
-      echo 'This will run only if the state of the Pipeline has changed'
-      echo 'For example, if the Pipeline was previously failing but is now successful'
-    }
-
-    echo 'This will always run'
+    //archiveArtifacts artifacts: 'build/libs/**/*.jar', fingerprint: true
+    //junit 'build/reports/**/*.xml'
   }
-
-  // docker.image('node:7-alpine').inside {
-  //   stage('Test') {
-  //     sh '''
-  //       node --version
-  //       echo "Done"
-  //     '''
-  //   }
-  // }
-
-  withEnv(['DISABLE_AUTH=true',
-        'DB_ENGINE=sqlite']) {
-    stage('Build2') {
-      sh 'printenv'
-    }
-  }
-
-  // environment {
-  //   AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-  //   AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-  // }
 }
