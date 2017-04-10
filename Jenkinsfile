@@ -1,5 +1,5 @@
 pipeline {
-    agent { docker 'mhart/alpine-node' }
+    agent { docker 'armhf/node' }
     stages {
         stage('build') {
             steps {
@@ -8,10 +8,10 @@ pipeline {
                     echo "Hello there"
                 '''
                 retry(3) {
-                    sh 'retry'
+                    sh 'echo retry'
                 }
                 timeout(time: 3, unit: 'SECONDS') {
-                    sh 'timeout 3 seconds'   
+                    sh 'echo timeout 3 seconds'   
                 }
             }
         }
