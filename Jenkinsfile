@@ -1,5 +1,5 @@
 pipeline {
-    agent { docker 'node:6.3' }
+    agent { docker 'mhart/alpine-node' }
     stages {
         stage('build') {
             steps {
